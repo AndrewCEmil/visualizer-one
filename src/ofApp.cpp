@@ -37,6 +37,9 @@ void ofApp::setup(){
     
     soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
     
+    for(int i = 0; i < 1024; i++) {
+        data.position[i] = 1.0;
+    }
 }
 
 //--------------------------------------------------------------
@@ -67,20 +70,22 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
     float n = buffer.size();
     float curAvg = 0;
+    std::cout << "buffer size: " << n << std::endl;
     for (int i = 0; i < 1024.0; i++) {
-        curAvg = 0;
-        for(int j = 0; j < n / 1024.0; j++) {
-            curAvg += sqrt(buffer[i + j]);
+        data.position[i] = (data.position[i] * 5 + sqrt(buffer[i])) / 6.0;
+        if(data.position[i] != data.position[i]) {
+            data.position[i] = 1.0;
         }
-        curAvg = (curAvg / (n / 1024.0));
-        data.position[i] = curAvg;
+        //std::cout << "pos: " << i << ", val: " << data.position[i] << std::endl;
+
     }
     
     shader.begin();
+    /*
     std::cout << "data 0   : " << data.position[0] << std::endl;
     std::cout << "data 200 : " << data.position[200] << std::endl;
     std::cout << "data 400 : " << data.position[400] << std::endl;
-    std::cout << "data 1000: " << data.position[1000] << std::endl;
+    std::cout << "data 1000: " << data.position[1000] << std::endl;*/
     
     shader.setUniformBuffer("Yvals", data);
     ofRect(0, 0, plotWidth, plotHeight);

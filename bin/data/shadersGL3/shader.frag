@@ -14,14 +14,15 @@ void main(void)
     float xPos = 0.0;
     float isClose = 0.0;
     float distSum = 0.0;
-    for(int i = -100; i < 100; i++) {
+    for(int i = -10; i < 10; i++) {
         distSum = distSum + abs(gl_FragCoord.y - (yvals.position[abs(int(gl_FragCoord.x) + i)] * height)) / 768;
     }
 
     float a = 1.0;
-    float dist = distSum / 200.0;
+    float dist = 1.0 - (distSum / 20.0);
 
-    outputColor = vec4(dist, dist, dist, a);
+    //float dist = abs(gl_FragCoord.y - (yvals.position[int(gl_FragCoord.x)] * height)) / 768;
+    outputColor = vec4(1.-dist, 1.-dist, 1.-dist, a);
 }
 
 /*
