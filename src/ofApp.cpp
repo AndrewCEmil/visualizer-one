@@ -87,7 +87,7 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         }
         
         //update max and scale
-        if (data.position[idx] > maxData.position[idx] && iterationCount > 30) {
+        if (data.position[idx] > maxData.position[idx] && iterationCount > 100) {
             maxData.position[idx] = data.position[idx];
         }
         data.position[idx] = data.position[idx] / maxData.position[idx];
@@ -107,6 +107,7 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
 //--------------------------------------------------------------
 void ofApp::audioIn(float * input, int bufferSize, int nChannels) {
     //FFT section
+    //Why am I scaling this input? is this a requirement for ofxfft?
     float maxValue = 0;
     for(int i = 0; i < bufferSize; i++) {
         if(abs(input[i]) > maxValue) {
@@ -116,12 +117,13 @@ void ofApp::audioIn(float * input, int bufferSize, int nChannels) {
     for(int i = 0; i < bufferSize; i++) {
         input[i] /= maxValue;
     }
-    
+    std::cout << "RAW maxvalue: " << maxValue << std::endl;
     fft->setSignal(input);
     
     float* curFft = fft->getAmplitude();
     memcpy(&audioBins[0], curFft, sizeof(float) * fft->getBinSize());
     
+    /*
     maxValue = 0;
     for(int i = 0; i < fft->getBinSize(); i++) {
         if(abs(audioBins[i]) > maxValue) {
@@ -130,7 +132,9 @@ void ofApp::audioIn(float * input, int bufferSize, int nChannels) {
     }
     for(int i = 0; i < fft->getBinSize(); i++) {
         audioBins[i] /= maxValue;
-    }
+    }*/
+    //std::cout << "FFT maxvalue: " << maxValue << std::endl;
+
     
     soundMutex.lock();
     middleBins = audioBins;
