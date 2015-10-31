@@ -34,6 +34,7 @@ class ofApp : public ofBaseApp{
     int     plotHeight;
     int     plotWidth;
     int     bufferSize;
+    int     iterationCount;
     
     float smoothedVol;
     float scaledVol;
@@ -45,5 +46,6 @@ class ofApp : public ofBaseApp{
     ofxUboShader shader;
     
     Yvals data;
+    Yvals maxData;
 		
 };

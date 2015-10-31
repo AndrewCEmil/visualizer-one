@@ -39,7 +39,9 @@ void ofApp::setup(){
     
     for(int i = 0; i < 10; i++) {
         data.position[i] = 0.0;
+        maxData.position[i] = 0.0;
     }
+    iterationCount = 0.0;
 }
 
 //--------------------------------------------------------------
@@ -68,6 +70,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
+    iterationCount++;
     float curAvg = 0;
     std::cout << "buffer size: " << buffer.size() << std::endl;
     int range = buffer.size() / 10;
@@ -82,6 +85,12 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         if(data.position[idx] != data.position[idx]) { //protect from NaN
             data.position[idx] = 1.0;
         }
+        
+        //update max and scale
+        if (data.position[idx] > maxData.position[idx] && iterationCount > 30) {
+            maxData.position[idx] = data.position[idx];
+        }
+        data.position[idx] = data.position[idx] / maxData.position[idx];
     }
     shader.begin();
     
