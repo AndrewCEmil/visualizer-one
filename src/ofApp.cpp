@@ -72,13 +72,14 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
     iterationCount++;
     float curAvg = 0;
+    std::cout << "Iteration: " << iterationCount << std::endl;
     std::cout << "buffer size: " << buffer.size() << std::endl;
-    int range = buffer.size() / 10;
+    int range = buffer.size() / numBuckets;
     float range_avg = 0.0;
-    for(int idx = 0; idx < 10; idx++) {
+    for(int idx = 0; idx < numBuckets; idx++) {
         range_avg = 0.0;
         for(int offset = 0; offset < range; offset++) {
-            range_avg += sqrt(buffer[(idx * 10) + offset]);
+            range_avg += sqrt(buffer[(idx * numBuckets) + offset]);
         }
         range_avg = range_avg / range;
         data.position[idx] = range_avg;
@@ -86,12 +87,28 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             data.position[idx] = 1.0;
         }
         
-        //update max and scale
-        if (data.position[idx] > maxData.position[idx] && iterationCount > 100) {
-            maxData.position[idx] = data.position[idx];
+        
+        if (iterationCount > 200) {
+            if(data.position[idx] > maxData.position[idx] && iterationCount > 200) {
+                maxData.position[idx] = data.position[idx];
+            }
+            data.position[idx] = data.position[idx] / maxData.position[idx];
         }
-        data.position[idx] = data.position[idx] / maxData.position[idx];
     }
+    float curmax = 0.0;
+    float curmin = 1.0;
+    for(int i = 0; i < numBuckets; i++) {
+        if (data.position[i] > curmax) {
+            curmax = data.position[i];
+        }
+        if(data.position[i] < curmin) {
+            curmin = data.position[i];
+        }
+    }
+    for(int i = 0; i < numBuckets; i++) {
+        data.position[i] = (data.position[i] - curmin) / (curmax - curmin);
+    }
+    
     shader.begin();
     
     std::cout << "data 0   : " << data.position[0] << std::endl;

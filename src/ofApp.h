@@ -35,6 +35,7 @@ class ofApp : public ofBaseApp{
     int     plotWidth;
     int     bufferSize;
     int     iterationCount;
+    int numBuckets = 10;
     
     float smoothedVol;
     float scaledVol;
