@@ -19,7 +19,7 @@ void ofApp::setup(){
     soundStream.setDeviceID(1); //bear in mind the device id corresponds to all audio devices, including  input-only and output-only devices.
     
     smoothedVol     = 0.0;
-    scaledVol		= 0.0;
+    scaledVol       = 0.0;
     
     //FFT stuff
     plotHeight = 768;
@@ -37,8 +37,8 @@ void ofApp::setup(){
     
     soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
     
-    for(int i = 0; i < 1024; i++) {
-        data.position[i] = 1.0;
+    for(int i = 0; i < 10; i++) {
+        data.position[i] = 0.0;
     }
 }
 
@@ -68,24 +68,27 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
-    float n = buffer.size();
     float curAvg = 0;
-    std::cout << "buffer size: " << n << std::endl;
-    for (int i = 0; i < 1024.0; i++) {
-        data.position[i] = (data.position[i] * 5 + sqrt(buffer[i])) / 6.0;
-        if(data.position[i] != data.position[i]) {
-            data.position[i] = 1.0;
+    std::cout << "buffer size: " << buffer.size() << std::endl;
+    int range = buffer.size() / 10;
+    float range_avg = 0.0;
+    for(int idx = 0; idx < 10; idx++) {
+        range_avg = 0.0;
+        for(int offset = 0; offset < range; offset++) {
+            range_avg += sqrt(buffer[(idx * 10) + offset]);
         }
-        //std::cout << "pos: " << i << ", val: " << data.position[i] << std::endl;
-
+        range_avg = range_avg / range;
+        data.position[idx] = range_avg;
+        if(data.position[idx] != data.position[idx]) { //protect from NaN
+            data.position[idx] = 1.0;
+        }
     }
-    
     shader.begin();
-    /*
+    
     std::cout << "data 0   : " << data.position[0] << std::endl;
-    std::cout << "data 200 : " << data.position[200] << std::endl;
-    std::cout << "data 400 : " << data.position[400] << std::endl;
-    std::cout << "data 1000: " << data.position[1000] << std::endl;*/
+    std::cout << "data 2 : " << data.position[2] << std::endl;
+    std::cout << "data 4 : " << data.position[4] << std::endl;
+    std::cout << "data 9: " << data.position[9] << std::endl;
     
     shader.setUniformBuffer("Yvals", data);
     ofRect(0, 0, plotWidth, plotHeight);

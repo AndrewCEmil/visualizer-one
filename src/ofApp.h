@@ -5,7 +5,7 @@
 #include "ofxUbo.h"
 
 struct Yvals {
-    float position[1024];
+    float position[10];
 };
 
 class ofApp : public ofBaseApp{
