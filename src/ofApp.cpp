@@ -97,6 +97,8 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     
     shader.begin();
     shader.setUniformBuffer("Yvals", data);
+    shader.setUniform1f("mode", currentMode);
+    
     ofRect(0, 0, plotWidth, plotHeight);
     shader.end();
 }
@@ -127,7 +129,13 @@ void ofApp::audioIn(float * input, int bufferSize, int nChannels) {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed  (int key){
-    
+    if (key == '0') {
+        currentMode = 0.0;
+    } else if (key == '1') {
+        currentMode = 1.0;
+    } else if (key == '2') {
+        currentMode = 2.0;
+    }
 }
 
 //--------------------------------------------------------------

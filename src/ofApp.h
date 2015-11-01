@@ -30,11 +30,12 @@ class ofApp : public ofBaseApp{
     
         vector <float> drawBins, middleBins, audioBins;
     
-        int     plotHeight;
-        int     plotWidth;
-        int     bufferSize;
-        int     iterationCount;
-        int     numBuckets = 10;
+        int plotHeight;
+        int plotWidth;
+        int bufferSize;
+        int iterationCount;
+        int numBuckets = 10;
+        float currentMode = 0.0;
     
         ofxFft* fft;
     
