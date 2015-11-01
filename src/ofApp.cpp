@@ -7,24 +7,12 @@ void ofApp::setup(){
     ofSetCircleResolution(80);
     ofBackground(54, 54, 54);
     
-    // 0 output channels,
-    // 2 input channels
-    // 44100 samples per second
-    // 256 samples per buffer
-    // 4 num buffers (latency)
-    
     soundStream.listDevices();
+    soundStream.setDeviceID(0);
     
-    //if you want to set a different device id
-    soundStream.setDeviceID(1); //bear in mind the device id corresponds to all audio devices, including  input-only and output-only devices.
-    
-    smoothedVol     = 0.0;
-    scaledVol       = 0.0;
-    
-    //FFT stuff
     plotHeight = 768;
     plotWidth = 1024;
-    bufferSize = 2048;
+    bufferSize = 2048; //Seems like this is too large actually
     
     fft = ofxFft::create(bufferSize, OF_FFT_WINDOW_HAMMING, OF_FFT_FFTW);
     
@@ -33,7 +21,6 @@ void ofApp::setup(){
     audioBins.resize(fft->getBinSize());
     
     shader.load("shadersGL3/shader");
-    
     
     soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
     
@@ -71,9 +58,7 @@ void ofApp::draw(){
 void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
     iterationCount++;
-    float curAvg = 0;
-    std::cout << "Iteration: " << iterationCount << std::endl;
-    std::cout << "buffer size: " << buffer.size() << std::endl;
+    
     int range = buffer.size() / numBuckets;
     float range_avg = 0.0;
     for(int idx = 0; idx < numBuckets; idx++) {
@@ -86,15 +71,16 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         if(data.position[idx] != data.position[idx]) { //protect from NaN
             data.position[idx] = 1.0;
         }
-        
-        
-        if (iterationCount > 200) {
+
+        if (iterationCount > 200) { //Wait 200 iterations before setting max
             if(data.position[idx] > maxData.position[idx] && iterationCount > 200) {
                 maxData.position[idx] = data.position[idx];
             }
             data.position[idx] = data.position[idx] / maxData.position[idx];
         }
     }
+    
+    //Adjust for current set of values
     float curmax = 0.0;
     float curmin = 1.0;
     for(int i = 0; i < numBuckets; i++) {
@@ -110,12 +96,6 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     }
     
     shader.begin();
-    
-    std::cout << "data 0   : " << data.position[0] << std::endl;
-    std::cout << "data 2 : " << data.position[2] << std::endl;
-    std::cout << "data 4 : " << data.position[4] << std::endl;
-    std::cout << "data 9: " << data.position[9] << std::endl;
-    
     shader.setUniformBuffer("Yvals", data);
     ofRect(0, 0, plotWidth, plotHeight);
     shader.end();
@@ -134,29 +114,15 @@ void ofApp::audioIn(float * input, int bufferSize, int nChannels) {
     for(int i = 0; i < bufferSize; i++) {
         input[i] /= maxValue;
     }
-    std::cout << "RAW maxvalue: " << maxValue << std::endl;
+    
     fft->setSignal(input);
     
     float* curFft = fft->getAmplitude();
     memcpy(&audioBins[0], curFft, sizeof(float) * fft->getBinSize());
     
-    /*
-    maxValue = 0;
-    for(int i = 0; i < fft->getBinSize(); i++) {
-        if(abs(audioBins[i]) > maxValue) {
-            maxValue = abs(audioBins[i]);
-        }
-    }
-    for(int i = 0; i < fft->getBinSize(); i++) {
-        audioBins[i] /= maxValue;
-    }*/
-    //std::cout << "FFT maxvalue: " << maxValue << std::endl;
-
-    
     soundMutex.lock();
     middleBins = audioBins;
     soundMutex.unlock();
-    
 }
 
 //--------------------------------------------------------------

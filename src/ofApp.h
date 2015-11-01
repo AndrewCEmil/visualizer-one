@@ -25,28 +25,23 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    void plot(vector<float>& buffer, float scale, float offset);
+        void plot(vector<float>& buffer, float scale, float offset);
+        void audioIn(float * input, int bufferSize, int nChannels);
     
-    void audioIn(float * input, int bufferSize, int nChannels);
+        vector <float> drawBins, middleBins, audioBins;
     
-    vector <float> drawBins, middleBins, audioBins;
+        int     plotHeight;
+        int     plotWidth;
+        int     bufferSize;
+        int     iterationCount;
+        int     numBuckets = 10;
     
-    int     plotHeight;
-    int     plotWidth;
-    int     bufferSize;
-    int     iterationCount;
-    int numBuckets = 10;
+        ofxFft* fft;
     
-    float smoothedVol;
-    float scaledVol;
+        ofMutex soundMutex;
+        ofSoundStream soundStream;
+        ofxUboShader shader;
     
-    ofxFft* fft;
-    
-    ofMutex soundMutex;
-    ofSoundStream soundStream;
-    ofxUboShader shader;
-    
-    Yvals data;
-    Yvals maxData;
-		
+        Yvals data;
+        Yvals maxData;
 };
