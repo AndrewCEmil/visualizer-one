@@ -59,48 +59,70 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     ofSetColor(255);
     iterationCount++;
     
-    int range = buffer.size() / numBuckets;
-    float range_avg = 0.0;
-    for(int idx = 0; idx < numBuckets; idx++) {
-        range_avg = 0.0;
-        for(int offset = 0; offset < range; offset++) {
-            range_avg += sqrt(buffer[(idx * numBuckets) + offset]);
-        }
-        range_avg = range_avg / range;
-        data.position[idx] = range_avg;
-        if(data.position[idx] != data.position[idx]) { //protect from NaN
-            data.position[idx] = 1.0;
+    if(currentMode == 1.0 || currentMode == 2.0) {
+        int range = buffer.size() / numBuckets;
+        float range_avg = 0.0;
+        for(int idx = 0; idx < numBuckets; idx++) {
+            range_avg = 0.0;
+            for(int offset = 0; offset < range; offset++) {
+                range_avg += sqrt(buffer[(idx * numBuckets) + offset]);
+            }
+            range_avg = range_avg / range;
+            data.position[idx] = range_avg;
+            if(data.position[idx] != data.position[idx]) { //protect from NaN
+                data.position[idx] = 1.0;
+            }
+
+            if (iterationCount > 200) { //Wait 200 iterations before setting max
+                if(data.position[idx] > maxData.position[idx] && iterationCount > 200) {
+                    maxData.position[idx] = data.position[idx];
+                }
+                data.position[idx] = data.position[idx] / maxData.position[idx];
+            }
         }
 
-        if (iterationCount > 200) { //Wait 200 iterations before setting max
-            if(data.position[idx] > maxData.position[idx] && iterationCount > 200) {
-                maxData.position[idx] = data.position[idx];
+        //Adjust for current set of values
+        float curmax = 0.0;
+        float curmin = 1.0;
+        for(int i = 0; i < numBuckets; i++) {
+            if (data.position[i] > curmax) {
+                curmax = data.position[i];
             }
-            data.position[idx] = data.position[idx] / maxData.position[idx];
+            if(data.position[i] < curmin) {
+                curmin = data.position[i];
+            }
         }
-    }
-    
-    //Adjust for current set of values
-    float curmax = 0.0;
-    float curmin = 1.0;
-    for(int i = 0; i < numBuckets; i++) {
-        if (data.position[i] > curmax) {
-            curmax = data.position[i];
+        for(int i = 0; i < numBuckets; i++) {
+            data.position[i] = (data.position[i] - curmin) / (curmax - curmin);
         }
-        if(data.position[i] < curmin) {
-            curmin = data.position[i];
+
+        shader.begin();
+        shader.setUniformBuffer("LineVals", lineVals);
+        shader.setUniformBuffer("Yvals", data);
+        shader.setUniform1f("mode", currentMode);
+        ofRect(0, 0, plotWidth, plotHeight);
+        shader.end();
+    } else { //Lines
+        for(int i = 0; i < buffer.size(); i++) {
+            lineVals.position[i] = buffer[i];
+            if(lineVals.position[i] != lineVals.position[i]) {
+                lineVals.position[i] = 1.0;
+            }
+            if (iterationCount > 200) { //Wait 200 iterations before setting max
+                if(lineVals.position[i] > maxLineVals.position[i] && iterationCount > 200) {
+                    maxLineVals.position[i] = lineVals.position[i];
+                }
+                lineVals.position[i] = lineVals.position[i] / maxLineVals.position[i];
+            }
         }
+   
+        shader.begin();
+        shader.setUniformBuffer("LineVals", lineVals);
+        shader.setUniformBuffer("Yvals", data);
+        shader.setUniform1f("mode", currentMode);
+        ofRect(0, 0, plotWidth, plotHeight);
+        shader.end();
     }
-    for(int i = 0; i < numBuckets; i++) {
-        data.position[i] = (data.position[i] - curmin) / (curmax - curmin);
-    }
-    
-    shader.begin();
-    shader.setUniformBuffer("Yvals", data);
-    shader.setUniform1f("mode", currentMode);
-    
-    ofRect(0, 0, plotWidth, plotHeight);
-    shader.end();
 }
 
 //--------------------------------------------------------------
@@ -135,6 +157,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 1.0;
     } else if (key == '2') {
         currentMode = 2.0;
+    } else if (key == '3') {
+        currentMode = 3.0;
     }
 }
 

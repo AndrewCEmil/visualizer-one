@@ -8,6 +8,10 @@ struct Yvals {
     float position[10];
 };
 
+struct LineVals {
+    float position[1024];
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -44,5 +48,7 @@ class ofApp : public ofBaseApp{
         ofxUboShader shader;
     
         Yvals data;
+        LineVals lineVals;
         Yvals maxData;
+        LineVals maxLineVals;
 };

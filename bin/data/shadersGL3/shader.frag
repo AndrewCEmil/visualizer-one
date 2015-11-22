@@ -7,6 +7,9 @@ uniform Yvals {
     float position[10];
 } yvals;
 
+uniform LineVals {
+    float position[1024];
+} linevals;
 
 void main(void)
 {
@@ -18,6 +21,8 @@ void main(void)
     int idxwidth = 0;
     bool isnear = false;
     vec3 colorSums = vec3(0.0);
+    float dist = 0.0;
+    float newdist = 0.0;
     
     if (mode == 1.0) {
         for (float i = 0.0; i < 10.0; i++) {
@@ -44,7 +49,11 @@ void main(void)
         } else {
             outputColor = vec4(1.0, 1.0, 1.0, 1.0);
         }
-    } else if (mode == 0.0) {
+    } else if (mode == 3.0) {
+        dist = distance(gl_FragCoord.xy, vec2(float(gl_FragCoord.x), linevals.position[int(gl_FragCoord.x)] * height));
+        dist = dist / height;
+        outputColor = vec4(dist, dist, dist, 1.0);
+    }else if (mode == 0.0) {
         outputColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
 }
