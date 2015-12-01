@@ -51,4 +51,6 @@ class ofApp : public ofBaseApp{
         LineVals lineVals;
         Yvals maxData;
         LineVals maxLineVals;
+    
+        ofMesh mesh;
 };

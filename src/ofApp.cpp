@@ -102,7 +102,7 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         shader.setUniform1f("mode", currentMode);
         ofRect(0, 0, plotWidth, plotHeight);
         shader.end();
-    } else { //Lines
+    } else if (currentMode == 3.0) { //Lines
         for(int i = 0; i < buffer.size(); i++) {
             lineVals.position[i] = buffer[i];
             if(lineVals.position[i] != lineVals.position[i]) {
@@ -122,6 +122,44 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         shader.setUniform1f("mode", currentMode);
         ofRect(0, 0, plotWidth, plotHeight);
         shader.end();
+    } else if (currentMode == 4.0) {
+        std::cout << "STARTING" << std::endl;
+        ofBackground(0);
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_LINES);
+        for (int x = 0; x < plotWidth; x++){
+            mesh.addVertex(ofPoint(x, buffer[x] * plotHeight * 10,0)); // make a new vertex
+            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));  // add a color at that vertex
+        }
+        for (int y = 0; y<plotWidth-1; y++){
+                mesh.addIndex(y);
+        }
+        /*
+
+        for (int y = 0; y < plotHeight; y++){
+            for (int x = 0; x<plotWidth; x++){
+                mesh.addVertex(ofPoint(x,y,abs(x - y))); // make a new vertex
+                mesh.addColor(ofFloatColor(float(y) / float(plotHeight),0,0));  // add a color at that vertex
+            }
+        }
+
+        // now it's important to make sure that each vertex is correctly connected with the
+        // other vertices around it. This is done using indices, which you can set up like so:
+        for (int y = 0; y<plotHeight-1; y++){
+            for (int x=0; x<plotWidth-1; x++){
+                mesh.addIndex(x+y*plotWidth);               // 0
+                mesh.addIndex((x+1)+y*plotWidth);           // 1
+                mesh.addIndex(x+(y+1)*plotWidth);           // 10
+                
+                mesh.addIndex((x+1)+y*plotWidth);           // 1
+                mesh.addIndex((x+1)+(y+1)*plotWidth);       // 11
+                mesh.addIndex(x+(y+1)*plotWidth);           // 10
+            }
+         }        */
+
+        std::cout << "ENDING" << std::endl;
+        
+        mesh.draw();
     }
 }
 
@@ -159,6 +197,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 2.0;
     } else if (key == '3') {
         currentMode = 3.0;
+    } else if (key == '4') {
+        currentMode = 4.0;
     }
 }
 
