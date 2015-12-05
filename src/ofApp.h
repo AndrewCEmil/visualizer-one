@@ -12,6 +12,10 @@ struct LineVals {
     float position[1024];
 };
 
+struct BufferHistory {
+    float buffers[1024][1024];
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -54,4 +58,5 @@ class ofApp : public ofBaseApp{
     
         ofMesh mesh;
         ofEasyCam cam;
+        BufferHistory history;
 };

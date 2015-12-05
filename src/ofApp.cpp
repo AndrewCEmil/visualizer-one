@@ -129,72 +129,24 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         ofRect(0, 0, plotWidth, plotHeight);
         shader.end();
     } else if (currentMode == 4.0) {
+        for(int i = 0; i < 1024; i++) {
+            history.buffers[iterationCount % 1024][i] = buffer[i];
+        }
         ofBackground(0);
         mesh.clear();
-        mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
-        
+        mesh.setMode(OF_PRIMITIVE_POINTS);
+        std::cout << "starting" << std::endl;
         
         int idx = 0;
-        for (int x = 0; x < plotWidth - 1; x++) {
-            
-            //Triangle popping out from grid
-            
-            mesh.addVertex(ofPoint(x,0,0));
-            mesh.addColor(ofFloatColor(1, 0, 0));
-            
-            mesh.addVertex(ofPoint(x, plotHeight / 2.0, buffer[x] * plotHeight * 10));
-            mesh.addColor(ofFloatColor(0, 1, 0));
-
-            mesh.addVertex(ofPoint(x,plotHeight - 1, 0));
-            mesh.addColor(ofFloatColor(0, 0, 1));
-            
-            mesh.addIndex(idx);
-            idx++;
-            mesh.addIndex(idx);
-            idx++;
-            mesh.addIndex(idx);
-            idx++;
-        }
-        
-        /*
-        mesh.addVertex(ofPoint(plotWidth, plotHeight, 0));
-        mesh.addColor(ofFloatColor(0, 0, 1));
-        mesh.addVertex(ofPoint(0,0,0));
-        mesh.addColor(ofFloatColor(0,1,0));
-        mesh.addVertex(ofPoint(plotWidth, plotHeight / 2, 0));
-        mesh.addColor(ofFloatColor(1,0,0));
-        mesh.addVertex(ofPoint(plotWidth, 0, 200));
-        mesh.addColor(ofFloatColor(.5,.5,.5));
-        mesh.addVertex(ofPoint(0,plotHeight,50));
-        mesh.addColor(ofFloatColor(.6,.6,.6));
-        
-        mesh.addIndex(3);
-        mesh.addIndex(1);
-        mesh.addIndex(2);
-        mesh.addIndex(0);
-        mesh.addIndex(4);
-        mesh.addIndex(2);
-        /*
-        for (int y = 0; y < plotHeight; y++){
-            for (int x = 0; x<plotWidth; x++){
-                mesh.addVertex(ofPoint(x,y,abs(x - y))); // make a new vertex
-                mesh.addColor(ofFloatColor(float(y) / float(plotHeight),0,0));  // add a color at that vertex
+        float *current;
+        for (int pos = 0; pos < 1024; pos++) {
+            current = history.buffers[(pos + iterationCount) % 1024];
+            for (int i = 0; i < 1024; i++) {
+                mesh.addVertex(ofPoint(pos, i, current[i] * 1000));
+                //mesh.addColor(ofFloatColor(pos / 128, i / 1024, current[i]));
+                mesh.addColor(ofFloatColor(1,1,1));
             }
         }
-
-        // now it's important to make sure that each vertex is correctly connected with the
-        // other vertices around it. This is done using indices, which you can set up like so:
-        for (int y = 0; y<plotHeight-1; y++){
-            for (int x=0; x<plotWidth-1; x++){
-                mesh.addIndex(x+y*plotWidth);               // 0
-                mesh.addIndex((x+1)+y*plotWidth);           // 1
-                mesh.addIndex(x+(y+1)*plotWidth);           // 10
-                
-                mesh.addIndex((x+1)+y*plotWidth);           // 1
-                mesh.addIndex((x+1)+(y+1)*plotWidth);       // 11
-                mesh.addIndex(x+(y+1)*plotWidth);           // 10
-            }
-         }*/
         
         mesh.draw();
     }
