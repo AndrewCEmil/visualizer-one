@@ -29,6 +29,10 @@ void ofApp::setup(){
         maxData.position[i] = 0.0;
     }
     iterationCount = 0.0;
+    
+    cam = ofEasyCam();
+    cam.enableMouseInput();
+    cam.enableMouseMiddleButton();
 }
 
 //--------------------------------------------------------------
@@ -36,6 +40,7 @@ void ofApp::update(){ }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    cam.begin();
     ofPushStyle();
     ofPushMatrix();
     
@@ -52,6 +57,7 @@ void ofApp::draw(){
     
     ofPopMatrix();
     ofPopStyle();
+    cam.end();
 }
 
 //--------------------------------------------------------------
@@ -123,19 +129,46 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         ofRect(0, 0, plotWidth, plotHeight);
         shader.end();
     } else if (currentMode == 4.0) {
-        std::cout << "STARTING" << std::endl;
         ofBackground(0);
         mesh.clear();
-        mesh.setMode(OF_PRIMITIVE_LINES);
-        for (int x = 0; x < plotWidth; x++){
-            mesh.addVertex(ofPoint(x, buffer[x] * plotHeight * 10,0)); // make a new vertex
-            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));  // add a color at that vertex
-        }
-        for (int y = 0; y<plotWidth-1; y++){
-                mesh.addIndex(y);
-        }
+        mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+        
         /*
 
+        for (int x = 0; x < plotWidth; x++){
+            mesh.addVertex(ofPoint(x,0,0));
+            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+            
+            mesh.addVertex(ofPoint(x, buffer[x] * plotHeight * 10,0)); // make a new vertex
+            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+
+            mesh.addVertex(ofPoint(x,plotHeight - 1, 0));
+            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+        }
+        for (int y = 0; y<plotWidth; y++){
+            mesh.addIndex((4 * y) - 2); //Previous bottom point
+            mesh.addIndex((4*y)); //current top point
+            mesh.addIndex(4*y + 2);//current point
+        }
+       */
+        mesh.addVertex(ofPoint(plotWidth, plotHeight, 0));
+        mesh.addColor(ofFloatColor(0, 0, 1));
+        mesh.addVertex(ofPoint(0,0,0));
+        mesh.addColor(ofFloatColor(0,1,0));
+        mesh.addVertex(ofPoint(plotWidth, plotHeight / 2, 0));
+        mesh.addColor(ofFloatColor(1,0,0));
+        mesh.addVertex(ofPoint(plotWidth, 0, 200));
+        mesh.addColor(ofFloatColor(.5,.5,.5));
+        mesh.addVertex(ofPoint(0,plotHeight,50));
+        mesh.addColor(ofFloatColor(.6,.6,.6));
+        
+        mesh.addIndex(3);
+        mesh.addIndex(1);
+        mesh.addIndex(2);
+        mesh.addIndex(0);
+        mesh.addIndex(4);
+        mesh.addIndex(2);
+        /*
         for (int y = 0; y < plotHeight; y++){
             for (int x = 0; x<plotWidth; x++){
                 mesh.addVertex(ofPoint(x,y,abs(x - y))); // make a new vertex
@@ -155,9 +188,7 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
                 mesh.addIndex((x+1)+(y+1)*plotWidth);       // 11
                 mesh.addIndex(x+(y+1)*plotWidth);           // 10
             }
-         }        */
-
-        std::cout << "ENDING" << std::endl;
+         }*/
         
         mesh.draw();
     }

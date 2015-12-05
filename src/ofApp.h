@@ -53,4 +53,5 @@ class ofApp : public ofBaseApp{
         LineVals maxLineVals;
     
         ofMesh mesh;
+        ofEasyCam cam;
 };
