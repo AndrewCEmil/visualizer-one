@@ -131,26 +131,32 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
     } else if (currentMode == 4.0) {
         ofBackground(0);
         mesh.clear();
-        mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+        mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
         
-        /*
-
-        for (int x = 0; x < plotWidth; x++){
-            mesh.addVertex(ofPoint(x,0,0));
-            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+        
+        int idx = 0;
+        for (int x = 0; x < plotWidth - 1; x++) {
             
-            mesh.addVertex(ofPoint(x, buffer[x] * plotHeight * 10,0)); // make a new vertex
-            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+            //Triangle popping out from grid
+            
+            mesh.addVertex(ofPoint(x,0,0));
+            mesh.addColor(ofFloatColor(1, 0, 0));
+            
+            mesh.addVertex(ofPoint(x, plotHeight / 2.0, buffer[x] * plotHeight * 10));
+            mesh.addColor(ofFloatColor(0, 1, 0));
 
             mesh.addVertex(ofPoint(x,plotHeight - 1, 0));
-            mesh.addColor(ofFloatColor(buffer[x]*plotHeight, x, 256-x));
+            mesh.addColor(ofFloatColor(0, 0, 1));
+            
+            mesh.addIndex(idx);
+            idx++;
+            mesh.addIndex(idx);
+            idx++;
+            mesh.addIndex(idx);
+            idx++;
         }
-        for (int y = 0; y<plotWidth; y++){
-            mesh.addIndex((4 * y) - 2); //Previous bottom point
-            mesh.addIndex((4*y)); //current top point
-            mesh.addIndex(4*y + 2);//current point
-        }
-       */
+        
+        /*
         mesh.addVertex(ofPoint(plotWidth, plotHeight, 0));
         mesh.addColor(ofFloatColor(0, 0, 1));
         mesh.addVertex(ofPoint(0,0,0));
