@@ -149,6 +149,43 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
         }
         
         mesh.draw();
+    } else if (currentMode == 5.0) {
+        for(int i = 0; i < 1024; i++) {
+            history.buffers[iterationCount % 1024][i] = buffer[i];
+        }
+        ofBackground(0);
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_POINTS);
+        int idx = 0;
+        float *current;
+        float x = 0;
+        //middle of the sphere is 0,0,0
+        //radius of the sphere is 1025
+        for (int y = 0; y < 1024; y++) {
+            //want all points where
+            for (int z = 0; z < 1024; z++) {
+                x = sqrt((1024 * 1024) - (y*y) - (z * z));
+                if (ceil(x) - x < .1) {
+                    mesh.addVertex(ofPoint(x, y, z)); //000
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, y, -z)); //001
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, -y, z)); //010
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, -y, -z));//011
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, y, z));//100
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, y, -z));//101
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, -y, z));//110
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, -y, -z));//111
+                    mesh.addColor(ofFloatColor(1,1,1));
+                }
+            }
+        }
+        mesh.draw();
     }
 }
 
@@ -188,6 +225,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 3.0;
     } else if (key == '4') {
         currentMode = 4.0;
+    } else if (key == '5') {
+        currentMode = 5.0;
     }
 }
 
