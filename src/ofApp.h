@@ -36,6 +36,9 @@ class ofApp : public ofBaseApp{
         void plot(vector<float>& buffer, float scale, float offset);
         void audioIn(float * input, int bufferSize, int nChannels);
     
+        ofPoint fromSpherical(ofPoint spherical);
+        ofPoint fromCartesian(ofPoint cartesian);
+    
         vector <float> drawBins, middleBins, audioBins;
     
         int plotHeight;

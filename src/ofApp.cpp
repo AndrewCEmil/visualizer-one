@@ -186,6 +186,24 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             }
         }
         mesh.draw();
+    } else if (currentMode == 6.0) {
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_POINTS);
+        ofBackground(0);
+        float radius = 1024;
+        float theta = 0;
+        float phi = 0;
+        std::cout << "STARTING" << std::endl;
+        for (double i = 0; i < 300; i++) {
+            for (double j = 0; j < 300; j++) {
+                theta = 2 * pi * (i / 300.0);
+                phi = pi * (j / 300.0);
+                //std::cout << "theta: " << theta << ", phi: " << phi << "radius: " << radius << std::endl;
+                mesh.addVertex(fromSpherical(ofPoint(radius, theta, phi)));
+                mesh.addColor(ofFloatColor(1,1,1));
+            }
+        }
+        mesh.draw();
     }
 }
 
@@ -227,6 +245,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 4.0;
     } else if (key == '5') {
         currentMode = 5.0;
+    } else if (key == '6') {
+        currentMode = 6.0;
     }
 }
 
@@ -268,5 +288,20 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
     
+}
+
+//(r, th, ph) -> (x, y, z)
+ofPoint ofApp::fromSpherical(ofPoint spherical) {
+    return ofPoint(spherical.x * sin(spherical.y) * cos(spherical.z),
+                   spherical.x * sin(spherical.y) * sin(spherical.z),
+                   spherical.x * cos(spherical.y));
+}
+
+//(x, y, z) -> (r, th, ph)
+ofPoint ofApp::fromCartesian(ofPoint cartesian) {
+    double r = sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z + cartesian.z);
+    return ofPoint(r,
+                   acos(cartesian.z / r),
+                   atan(cartesian.y / cartesian.x));
 }
 
