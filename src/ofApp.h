@@ -47,6 +47,7 @@ class ofApp : public ofBaseApp{
         int iterationCount;
         int numBuckets = 10;
         float currentMode = 0.0;
+    float a = 0.0;
     
         ofxFft* fft;
     

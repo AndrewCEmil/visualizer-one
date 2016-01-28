@@ -211,6 +211,76 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             }
         }
         mesh.draw();
+    } else if (currentMode == 7.0) { //"4d" spherical coords
+        for(int i = 0; i < 1024; i++) {
+            history.buffers[iterationCount % 1024][i] = buffer[i];
+        }
+        ofBackground(0);
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_POINTS);
+        int idx = 0;
+        float *current;
+        float x = 0;
+        //middle of the sphere is 0,0,0
+        //radius of the sphere is 1025
+        for (int y = 0; y < 1024; y++) {
+            //want all points where
+            for (int z = 0; z < 1024; z++) {
+                x = sqrt((1024 * 1024) - (y*y) - (z * z) - (a * a));
+                if (ceil(x) - x < .1) {
+                    mesh.addVertex(ofPoint(x, y, z)); //000
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, y, -z)); //001
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, -y, z)); //010
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(x, -y, -z));//011
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, y, z));//100
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, y, -z));//101
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, -y, z));//110
+                    mesh.addColor(ofFloatColor(1,1,1));
+                    mesh.addVertex(ofPoint(-x, -y, -z));//111
+                    mesh.addColor(ofFloatColor(1,1,1));
+                }
+            }
+        }
+        mesh.draw();
+    } else if (currentMode == 8.0) { //Ball of lines
+        double count = 300;
+        int icount = (int)count;
+        for(int i = 0; i < icount; i++) {
+            history.buffers[iterationCount % icount][i] = buffer[i];
+        }
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_LINES);
+        ofBackground(1);
+        float radius = 2048;
+        float theta = 0;
+        float phi = 0;
+        float *current;
+        std::cout << "STARTING" << std::endl;
+        mesh.addVertex(ofPoint(0,0,0));
+        mesh.addColor(ofFloatColor(1,1,1));
+        for (double i = 0; i < count; i++) {
+            current = history.buffers[((int)i + iterationCount) % icount];
+            for (double j = 0; j < count; j++) {
+                theta = 2 * pi * (i / count);
+                phi = pi * (j / count);
+                //std::cout << "theta: " << theta << ", phi: " << phi << "radius: " << radius << std::endl;
+                mesh.addVertex(fromSpherical(ofPoint(radius + current[(int)j] * 10000, theta, phi)));
+                mesh.addColor(ofFloatColor(0,0,0));
+            }
+        }
+        
+        for(int i = 0; i < count * count; i++) {
+            //std::cout << "Adding: " << i + 1 << std::endl;
+            mesh.addIndex(0);
+            mesh.addIndex(i + 1);
+        }
+        mesh.draw();
     }
 }
 
@@ -254,6 +324,16 @@ void ofApp::keyPressed  (int key){
         currentMode = 5.0;
     } else if (key == '6') {
         currentMode = 6.0;
+    } else if (key == '7') {
+        currentMode = 7.0;
+    } else if (key == '8') {
+        currentMode = 8.0;
+    } else if (key == '-') {
+        a--;
+    } else if (key == '+') {
+        a++;
+    } else {
+        std::cout << string(1,key) << std::endl;
     }
 }
 
