@@ -54,6 +54,7 @@ class ofApp : public ofBaseApp{
         float a = 0.0;
         bool hasPickedTriangles = false;
         Triangles triangles;
+        ofIcoSpherePrimitive ico;
     
         ofxFft* fft;
     

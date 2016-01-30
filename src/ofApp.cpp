@@ -281,7 +281,7 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             mesh.addIndex(i + 1);
         }
         mesh.draw();
-    } else if (currentMode == 9.0) {
+    } else if (currentMode == 9.0) { //Ball of triangles - ugly
         double count = 300;
         int icount = (int)count;
         for(int i = 0; i < icount; i++) {
@@ -319,14 +319,14 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             }
         }
         mesh.draw();
-    } else if (currentMode == 0.0) {
+    } else if (currentMode == 0.0) { //Smooth triangle ball - basically like points but a little different
         double count = 300;
         int icount = (int)count;
         for(int i = 0; i < icount; i++) {
             history.buffers[iterationCount % icount][i] = buffer[i];
         }
         mesh.clear();
-        mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+        mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
         ofBackground(0);
         float radius = 2048;
         float theta = 0;
@@ -343,12 +343,46 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
                 mesh.addColor(ofFloatColor(i/count,j/count,.5));
             }
         }
-        for(int i = 0; i < count; i++) {
-            for(int j = 1; j < count; j++) {
+        for(int i = 0; i < count -1; i++) {
+            for(int j = 0; j < count -1; j++) {
                 mesh.addIndex(i*count + j); //i, j
                 mesh.addIndex((i+1)*count + j); //i+1, j
                 mesh.addIndex((i+1)*count + j + 1); //i+1, j+1
             }
+        }
+        mesh.draw();
+    } else if (currentMode == 10.0) {
+        ico.setRadius( 512 );
+        ico.setPosition(0,0,0);
+        ofBackground(0);
+        mesh.clear();
+        ico.setResolution(3);
+        vector<ofMeshFace> triangles = ico.getMesh().getUniqueFaces();
+        double count = floor(sqrt(triangles.size()));
+        int icount = (int)count;
+        for(int i = 0; i < icount; i++) {
+            history.buffers[iterationCount % icount][i] = buffer[i];
+        }
+
+        float *current;
+        mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+        for(int i = 0; i < icount; i++) {
+            current = history.buffers[(i + iterationCount) % icount];
+            for(int j = 0; j < icount; j++) {
+                for(int t = 0; t < 3; t++) {
+                    ofVec3f curTex = triangles[i*(icount - 1) + j].getVertex(t);
+                    curTex[0] += current[j] * 1000;
+                    curTex[1] += current[j] * 1000;
+                    curTex[2] += current[j] * 1000;
+                    mesh.addVertex(curTex);
+                    mesh.addColor(ofFloatColor(curTex.distance(ofPoint(0,0,0)) / 800.0, 0, 1, .7));
+                }
+            }
+        }
+        for(int i = 0; i < triangles.size(); i++) {
+            mesh.addIndex(i * 3);
+            mesh.addIndex(i * 3 + 1);
+            mesh.addIndex(i * 3 + 2);
         }
         mesh.draw();
     }
@@ -400,6 +434,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 8.0;
     } else if (key == '9') {
         currentMode = 9.0;
+    } else if (key == 'a') {
+        currentMode = 10.0;
     } else if (key == '-') {
         a--;
     } else if (key == '+') {
