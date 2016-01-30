@@ -281,6 +281,44 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             mesh.addIndex(i + 1);
         }
         mesh.draw();
+    } else if (currentMode == 9.0) {
+        double count = 300;
+        int icount = (int)count;
+        for(int i = 0; i < icount; i++) {
+            history.buffers[iterationCount % icount][i] = buffer[i];
+        }
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+        ofBackground(0);
+        float radius = 2048;
+        float theta = 0;
+        float phi = 0;
+        float *current;
+        std::cout << "STARTING" << std::endl;
+        for (double i = 0; i < count; i++) {
+            current = history.buffers[((int)i + iterationCount) % icount];
+            for (double j = 0; j < count; j++) {
+                theta = 2 * pi * (i / count);
+                phi = pi * (j / count);
+                //std::cout << "theta: " << theta << ", phi: " << phi << "radius: " << radius << std::endl;
+                mesh.addVertex(fromSpherical(ofPoint(radius + current[(int)j] * 10000, theta, phi)));
+                mesh.addColor(ofFloatColor(.5,.5,.5));
+            }
+        }
+        if (!hasPickedTriangles) {
+            for(int i = 0; i < count; i++) {
+                for(int j = 0; j < 3; j++) {
+                    int idx = std::floor(rand() % ((int) (count * count)));
+                    triangles.triangles[i][j] = idx;
+                }
+            }
+        }
+        for(int i = 0; i < count; i++) {
+            for(int j = 0; j < 3; j++) {
+                mesh.addIndex(triangles.triangles[i][j]);
+            }
+        }
+        mesh.draw();
     }
 }
 
@@ -328,6 +366,8 @@ void ofApp::keyPressed  (int key){
         currentMode = 7.0;
     } else if (key == '8') {
         currentMode = 8.0;
+    } else if (key == '9') {
+        currentMode = 9.0;
     } else if (key == '-') {
         a--;
     } else if (key == '+') {

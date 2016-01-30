@@ -16,6 +16,10 @@ struct BufferHistory {
     float buffers[1024][1024];
 };
 
+struct Triangles {
+    int triangles[300][3];
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -47,7 +51,9 @@ class ofApp : public ofBaseApp{
         int iterationCount;
         int numBuckets = 10;
         float currentMode = 0.0;
-    float a = 0.0;
+        float a = 0.0;
+        bool hasPickedTriangles = false;
+        Triangles triangles;
     
         ofxFft* fft;
     
