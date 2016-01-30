@@ -319,6 +319,38 @@ void ofApp::plot(vector<float>& buffer, float scale, float offset) {
             }
         }
         mesh.draw();
+    } else if (currentMode == 0.0) {
+        double count = 300;
+        int icount = (int)count;
+        for(int i = 0; i < icount; i++) {
+            history.buffers[iterationCount % icount][i] = buffer[i];
+        }
+        mesh.clear();
+        mesh.setMode(OF_PRIMITIVE_TRIANGLES);
+        ofBackground(0);
+        float radius = 2048;
+        float theta = 0;
+        float phi = 0;
+        float *current;
+        std::cout << "STARTING" << std::endl;
+        for (double i = 0; i < count; i++) {
+            current = history.buffers[((int)i + iterationCount) % icount];
+            for (double j = 0; j < count; j++) {
+                theta = 2 * pi * (i / count);
+                phi = pi * (j / count);
+                //std::cout << "theta: " << theta << ", phi: " << phi << "radius: " << radius << std::endl;
+                mesh.addVertex(fromSpherical(ofPoint(radius + current[(int)j] * 1000, theta, phi)));
+                mesh.addColor(ofFloatColor(i/count,j/count,.5));
+            }
+        }
+        for(int i = 0; i < count; i++) {
+            for(int j = 1; j < count; j++) {
+                mesh.addIndex(i*count + j); //i, j
+                mesh.addIndex((i+1)*count + j); //i+1, j
+                mesh.addIndex((i+1)*count + j + 1); //i+1, j+1
+            }
+        }
+        mesh.draw();
     }
 }
 
